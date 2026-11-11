@@ -27,9 +27,9 @@ The pipeline is defined in [`.github/workflows/ci-cd.yml`](.github/workflows/ci-
 
 | Event                          | What runs                     |
 |--------------------------------|-------------------------------|
+| Push to any branch             | **CI** only (tests)           |
 | Pull request into `main`       | **CI** only (tests)           |
 | Push / merge into `main`       | **CI**, then **CD** (publish) |
-| Push to any other branch       | Nothing                       |
 
 ### Stage 1 — CI (`test` job)
 
@@ -56,7 +56,10 @@ Runs only after the tests pass, and only for pushes to `main`.
 ### Typical workflow
 
 ```text
-work on a branch ──► open PR to main ──► tests run on the PR
+push to a branch ──► tests run on every push
+       │
+       ▼
+open PR to main ──► tests run on the PR
                                               │
                                      merge if green
                                               ▼
