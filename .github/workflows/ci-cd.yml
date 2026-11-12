@@ -64,7 +64,10 @@ jobs:
         run: docker build -t $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/${{ vars.APP_IMAGE }}:$(echo $GITHUB_SHA | head -c24) .
 
       - name: Push backend image to Container Registry
-        run: docker push $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/${{ vars.APP_IMAGE }}:$( $GITHUB_SHA | head -c24)
+        run: docker push $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/${{ vars.APP_IMAGE }}:$(echo $GITHUB_SHA | head -c24)
+
+        #docker push $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/$(echo ${{ secrets.STAGE_APP_IMAGE }}):$(echo $GITHUB_SHA | head -c24)
+        #
 
       - name: Tag backend image with latest
         run: docker tag $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/${{ vars.APP_IMAGE }}:$(echo $GITHUB_SHA | head -c24) $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/$(echo ${{ secrets.STAGE_APP_IMAGE }}):latest
