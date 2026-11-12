@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Africa Clock</title>
+  <style>
+    :root {
+      --bg: #faf7f2;
+      --surface: #ffffff;
+      --surface-2: #f3eee6;
+      --text: #1f1b16;
+      --muted: #6b6258;
+      --border: #e6dfd4;
+      --accent: #c2410c;
+      --accent-soft: #fde7d9;
+      --day: #d97706;
+      --night: #4f46e5;
+      --shadow: 0 1px 2px rgba(31, 27, 22, .06), 0 8px 24px rgba(31, 27, 22, .06);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #14110e;
+        --surface: #1d1915;
+        --surface-2: #26211c;
+        --text: #f4efe8;
+        --muted: #a39a8f;
+        --border: #342d26;
+        --accent: #fb923c;
+        --accent-soft: #3a2416;
+        --day: #fbbf24;
+        --night: #a5b4fc;
+        --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.5;
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 16px 48px; }
+    header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+    h1 { font-size: 1.5rem; margin: 0; letter-spacing: -.01em; }
+    h1 span { color: var(--accent); }
+    .sub { color: var(--muted); font-size: .9rem; margin: 0; }
+
+    /* Featured clock */
+    .hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      display: grid;
+      gap: 20px;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+    .hero .place { font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .hero .country { color: var(--muted); font-weight: 400; }
+    .hero .clock {
+      font-size: clamp(3rem, 12vw, 6rem);
+      font-weight: 700;
+      letter-spacing: -.03em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      margin: 12px 0 8px;
+    }
+    .hero .clock .sec { color: var(--muted); font-size: .45em; font-weight: 600; margin-left: 4px; }
+    .hero .date { font-size: 1.1rem; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .chip {
+      font-size: .8rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .chip.accent { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+    .picker { display: flex; flex-direction: column; gap: 6px; min-width: 220px; }
+    .picker label { font-size: .8rem; color: var(--muted); }
+    select, input[type="search"] {
+      font: inherit;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      width: 100%;
+    }
+    select:focus, input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+    /* Grid of cities */
+    .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+    .toolbar h2 { font-size: 1rem; margin: 0; }
+    .toolbar input { max-width: 280px; }
+    .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+    .card {
+      text-align: left;
+      font: inherit;
+      color: inherit;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: border-color .15s, transform .15s;
+    }
+    .card:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .card.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .card .top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .card .name { font-weight: 600; }
+    .card .ctry { color: var(--muted); font-size: .8rem; }
+    .card .t { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; margin-top: 6px; }
+    .card .d { color: var(--muted); font-size: .8rem; }
+    .icon { width: 18px; height: 18px; flex: none; }
+    .icon.day { color: var(--day); }
+    .icon.night { color: var(--night); }
+    .empty { color: var(--muted); padding: 24px 0; }
+    footer { margin-top: 32px; color: var(--muted); font-size: .8rem; }
+    footer code { background: var(--surface-2); padding: 2px 6px; border-radius: 6px; }
+    footer a { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .hero { grid-template-columns: 1fr; padding: 20px; }
+      .picker { min-width: 0; }
+      .toolbar input { max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Africa <span>Clock</span></h1>
+      <p class="sub">Live time and date across African cities</p>
+    </header>
+
+    <section class="hero" aria-live="polite">
+      <div>
+        <div class="place"><span id="h-icon"></span><span id="h-city">—</span><span class="country" id="h-country"></span></div>
+        <div class="clock"><span id="h-time">--:--</span><span class="sec" id="h-sec">--</span></div>
+        <div class="date" id="h-date">Loading…</div>
+        <div class="chips">
+          <span class="chip accent" id="h-offset"></span>
+          <span class="chip" id="h-diff"></span>
+          <span class="chip" id="h-tz"></span>
+        </div>
+      </div>
+      <div class="picker">
+        <label for="city-select">Choose a city</label>
+        <select id="city-select"></select>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <h2>All cities</h2>
+      <input type="search" id="filter" placeholder="Filter by city or country…" aria-label="Filter cities">
+    </div>
+    <div class="grid" id="grid"></div>
+
+    <footer>
+      API: <a href="/api/cities"><code>/api/cities</code></a> ·
+      <a href="/api/time?city=nairobi"><code>/api/time?city=nairobi</code></a> ·
+      <a href="/api/time"><code>/api/time</code></a> (UTC)
+    </footer>
+  </div>
+
+  <script>
+    const SUN = '<svg class="icon day" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-label="Daytime"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+    const MOON = '<svg class="icon night" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-label="Night-time"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+
+    let cities = [];
+    let skew = 0;          // server clock minus browser clock, in ms
+    let selected = null;
+
+    const $ = (id) => document.getElementById(id);
+    const store = {
+      get() { try { return localStorage.getItem('africa-clock-city'); } catch { return null; } },
+      set(v) { try { localStorage.setItem('africa-clock-city', v); } catch {} },
+    };
+
+    function partsIn(tz, now) {
+      const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
+        timeZone: tz, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
+      }).formatToParts(now).map((x) => [x.type, x.value]));
+      return p;
+    }
+
+    // Offset of a zone from UTC in minutes at a given instant.
+    function offsetMinutes(tz, now) {
+      const p = partsIn(tz, now);
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const asUtc = Date.UTC(+p.year, months.indexOf(p.month), +p.day, +p.hour, +p.minute, +p.second);
+      return Math.round((asUtc - Math.floor(now.getTime() / 1000) * 1000) / 60000);
+    }
+
+    function fmtOffset(min) {
+      const sign = min < 0 ? '−' : '+';
+      const a = Math.abs(min);
+      return `UTC${sign}${Math.floor(a / 60)}${a % 60 ? ':' + String(a % 60).padStart(2, '0') : ''}`;
+    }
+
+    function fmtDiff(min) {
+      if (min === 0) return 'Same time as you';
+      const a = Math.abs(min);
+      const h = Math.floor(a / 60), m = a % 60;
+      const span = (h ? `${h}h` : '') + (m ? ` ${m}m` : '');
+      return `${span.trim()} ${min > 0 ? 'ahead of' : 'behind'} you`;
+    }
+
+    function renderOptions() {
+      $('city-select').innerHTML = cities
+        .map((c) => `<option value="${c.id}">${c.city}, ${c.country}</option>`)
+        .join('');
+    }
+
+    function renderGrid() {
+      const q = $('filter').value.trim().toLowerCase();
+      const shown = cities.filter((c) => !q || c.city.toLowerCase().includes(q) || c.country.toLowerCase().includes(q));
+      $('grid').innerHTML = shown.length
+        ? shown.map((c) => `
+          <button class="card${c.id === selected ? ' active' : ''}" data-id="${c.id}">
+            <div class="top">
+              <div><div class="name">${c.city}</div><div class="ctry">${c.country}</div></div>
+              <span data-icon></span>
+            </div>
+            <div class="t" data-time>--:--</div>
+            <div class="d" data-date></div>
+          </button>`).join('')
+        : '<p class="empty">No cities match that filter.</p>';
+      tick();
+    }
+
+    function select(id) {
+      selected = id;
+      store.set(id);
+      $('city-select').value = id;
+      const url = new URL(location);
+      url.searchParams.set('city', id);
+      history.replaceState(null, '', url);
+      document.querySelectorAll('.card').forEach((el) => el.classList.toggle('active', el.dataset.id === id));
+      tick();
+    }
+
+    function tick() {
+      const now = new Date(Date.now() + skew);
+      const localOffset = -now.getTimezoneOffset();
+
+      const c = cities.find((x) => x.id === selected);
+      if (c) {
+        const p = partsIn(c.timezone, now);
+        const off = offsetMinutes(c.timezone, now);
+        $('h-city').textContent = c.city;
+        $('h-country').textContent = c.country;
+        $('h-icon').innerHTML = +p.hour >= 6 && +p.hour < 18 ? SUN : MOON;
+        $('h-time').textContent = `${p.hour}:${p.minute}`;
+        $('h-sec').textContent = p.second;
+        $('h-date').textContent = `${p.weekday}, ${p.day} ${p.month} ${p.year}`;
+        $('h-offset').textContent = fmtOffset(off);
+        $('h-diff').textContent = fmtDiff(off - localOffset);
+        $('h-tz').textContent = c.timezone;
+        document.title = `${p.hour}:${p.minute} in ${c.city} · Africa Clock`;
+      }
+
+      document.querySelectorAll('.card').forEach((el) => {
+        const city = cities.find((x) => x.id === el.dataset.id);
+        const p = partsIn(city.timezone, now);
+        el.querySelector('[data-time]').textContent = `${p.hour}:${p.minute}`;
+        el.querySelector('[data-date]').textContent =
+          `${p.weekday.slice(0, 3)} ${p.day} ${p.month.slice(0, 3)} · ${fmtOffset(offsetMinutes(city.timezone, now))}`;
+        el.querySelector('[data-icon]').innerHTML = +p.hour >= 6 && +p.hour < 18 ? SUN : MOON;
+      });
+    }
+
+    async function load() {
+      try {
+        const res = await fetch('/api/cities');
+        const data = await res.json();
+        skew = Date.parse(data.timestamp) - Date.now();
+        // Sort west-to-east by UTC offset, then alphabetically.
+        const now = new Date();
+        cities = data.cities.sort((a, b) =>
+          offsetMinutes(a.timezone, now) - offsetMinutes(b.timezone, now) || a.city.localeCompare(b.city));
+        renderOptions();
+        const wanted = new URLSearchParams(location.search).get('city') || store.get();
+        selected = cities.some((c) => c.id === wanted) ? wanted : 'nairobi';
+        renderGrid();
+        select(selected);
+        // Align ticks to the start of each second.
+        setTimeout(() => { tick(); setInterval(tick, 1000); }, 1000 - ((Date.now() + skew) % 1000));
+      } catch (err) {
+        $('h-date').textContent = 'Could not load cities. Is the server running?';
+      }
+    }
+
+    $('city-select').addEventListener('change', (e) => select(e.target.value));
+    $('filter').addEventListener('input', renderGrid);
+    $('grid').addEventListener('click', (e) => {
+      const card = e.target.closest('.card');
+      if (card) {
+        select(card.dataset.id);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+    load();
+  </script>
+</body>
+</html>
