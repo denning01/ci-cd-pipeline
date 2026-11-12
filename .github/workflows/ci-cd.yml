@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+
+env:
+  REGISTRY_URL: "index.docker.io"
+
 jobs:
   test:
     runs-on: ubuntu-latest
