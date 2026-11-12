@@ -4,11 +4,24 @@ A simple Node.js app with a CI/CD pipeline built on GitHub Actions.
 
 ## Endpoints
 
-| Route       | Response                                                      |
-|-------------|---------------------------------------------------------------|
-| `/`         | HTML "Hello from Node!" page                                  |
-| `/api/time` | Current time in UTC, e.g. `{"time":"Wed, 11 Nov 2026 12:15:54 GMT"}` |
-| anything else | `404 {"error":"Not found"}`                                 |
+| Route                     | Response                                                                 |
+|---------------------------|--------------------------------------------------------------------------|
+| `/`                       | Africa Clock page: live time and date for African cities                 |
+| `/api/time`               | Current time in UTC, e.g. `{"time":"Wed, 11 Nov 2026 12:15:54 GMT"}`    |
+| `/api/time?city=<city>`   | Time and date in that city (see below)                                   |
+| `/api/cities`             | Every supported city with its current time and date                      |
+| anything else             | `404 {"error":"Not found"}`                                              |
+
+`city` accepts an id or a name, e.g. `lagos`, `cape-town` or `Dar es Salaam`. Example:
+
+```json
+GET /api/time?city=nairobi
+{"id":"nairobi","city":"Nairobi","country":"Kenya","timezone":"Africa/Nairobi",
+ "date":"2026-11-12","time":"12:31:14","weekday":"Thursday","utcOffset":"+03:00",
+ "formatted":"Thursday, 12 November 2026, 12:31:14","timestamp":"2026-11-12T09:31:14.502Z"}
+```
+
+An unknown city returns `404`. Cities are defined in [`cities.js`](cities.js); add a line there to support another one.
 
 ## Running locally
 
