@@ -40,16 +40,16 @@ jobs:
           password: ${{ secrets.G_TOKEN }}
 
       - name: Build backend image
-        run: docker build -t $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/$(echo ${{ secrets.STAGE_APP_IMAGE }}):$(echo $GITHUB_SHA | head -c24) .
+        run: docker build -t $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/$(echo ${{ var.APP_IMAGE }}):$(echo $GITHUB_SHA | head -c24) .
 
       - name: Push backend image to Container Registry
-        run: docker push $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/$(echo ${{ secrets.STAGE_APP_IMAGE }}):$(echo $GITHUB_SHA | head -c24)
+        run: docker push $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/$(echo ${{ var.APP_IMAGE }}):$(echo $GITHUB_SHA | head -c24)
 
       - name: Tag backend image with latest
-        run: docker tag $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/$(echo ${{ secrets.STAGE_APP_IMAGE }}):$(echo $GITHUB_SHA | head -c24) $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/$(echo ${{ secrets.STAGE_APP_IMAGE }}):latest
+        run: docker tag $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/$(echo ${{ var.APP_IMAGE }}):$(echo $GITHUB_SHA | head -c24) $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/$(echo ${{ secrets.STAGE_APP_IMAGE }}):latest
 
       - name: Push image with tag latest
-        run: docker push $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/$(echo ${{ secrets.STAGE_APP_IMAGE }}):latest
+        run: docker push $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/$(echo ${{ var.APP_IMAGE }}):latest
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
