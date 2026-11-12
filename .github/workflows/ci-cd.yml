@@ -69,12 +69,7 @@ jobs:
         #docker push $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/$(echo ${{ secrets.STAGE_APP_IMAGE }}):$(echo $GITHUB_SHA | head -c24)
         #
 
-      - name: Tag backend image with latest
-        run: docker tag $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/${{ vars.APP_IMAGE }}:$(echo $GITHUB_SHA | head -c24) $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})/$(echo ${{ secrets.STAGE_APP_IMAGE }}):latest
-
-      - name: Push image with tag latest
-        run: docker push $(echo $REGISTRY_URL)/$(echo ${{ secrets.DOCKER_USER }})${{ vars.APP_IMAGE }}:latest
-
+    
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
